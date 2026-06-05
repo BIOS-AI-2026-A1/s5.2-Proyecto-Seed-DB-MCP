@@ -1,0 +1,7 @@
+# Datos locales del volumen de Postgres (no se versionan).
+pgdata/
+*.log
+
+# Credenciales reales — nunca commitear (la seed usa app:app de juguete).
+.env
+.env.*

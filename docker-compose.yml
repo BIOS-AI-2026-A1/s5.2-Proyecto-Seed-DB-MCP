@@ -1,0 +1,33 @@
+# Seed DB para S5.2 — Claude Code + MCPs + Warp
+# Postgres 16 con 3 tablas relacionadas (customers, orders, order_items)
+# para conectar el MCP de Postgres y pedirle a Claude una query con JOIN.
+#
+#   docker compose up -d        # levanta la DB
+#   docker compose ps           # debería decir "healthy"
+#   docker compose down         # apaga
+#   docker compose down -v      # apaga y BORRA los datos (recrea limpio al subir)
+#
+# Cadena de conexión para el MCP:
+#   postgresql://app:app@localhost:5432/tienda
+services:
+  db:
+    image: postgres:16
+    container_name: s52-seed-db
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: tienda
+    ports:
+      - "5432:5432"
+    volumes:
+      # init.sql corre automáticamente la PRIMERA vez que el volumen está vacío.
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - seed_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d tienda"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  seed_pgdata:
